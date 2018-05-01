@@ -21,10 +21,10 @@ git push origin --delete [branch_name] | Delete the remote branch
 
 
 #### notes ####
-**[remote_name]** - by default you have only one remote repository called 'origin'
-**[branch_name]** - typically consists of two parts ('feature/ASD-4385-workflow-for-shop', 'bugfix/ASD-4512')
-**working copy** - checked out copy of files, which you can see and edit
-**head**  - reference to current (base) commit of your working copy
+**[remote_name]** - by default you have only one remote repository named 'origin'  
+**[branch_name]** - typically consists of two parts ('feature/ASD-4385-workflow-for-shop', 'bugfix/ASD-4512')  
+**working copy** - checked out copy of files, which you can see and edit  
+**head**  - reference to current (base) commit of your working copy  
 
 
 ## git file commands ##
@@ -62,10 +62,10 @@ git revert | TO DESCRIBE
 Command | Description
 --- | ---
 git tag --list --contains d485e45 | Show all tags containing given commit
-git log --pretty=format:"%h - %an, %ar: %s" \| grep 'strange' | Show commits with word 'strange'
+git log --pretty=format:"%h - %an, %ar: %s" \| grep 'strange' | Show all commits with word 'strange'
 
 
-#### How to check if one commit contains another commit (copy-paste to shell) ####
+### How to check if one commit contains another commit (copy-paste to shell) ###
 ```bash
 parent=d485e45; child=9dcd29d; echo; echo -n "Result: commit" $parent;\
 if (git merge-base --is-ancestor $parent $child);\
