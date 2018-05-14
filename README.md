@@ -5,6 +5,7 @@
 * **angular**
 * **docker**
 * **dotnet**
+* **azure**
 * **powershell core**
 
 ## Goals ##

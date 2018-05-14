@@ -14,17 +14,20 @@ git push | Send new local commits of the current branch to its **existing** <br>
 git push -f [remote_name] [branch_name] | The same, but force and explicitly
 git fetch | Download new commits of remote-tracking branches
 git pull | Downlad and apply (merge) new commits to the current branch
-git pull --rebase origin | The same, but using rebase instead of merge <br> and explicit remote
+git pull --rebase | The same, but using rebase instead of merge
 git branch -d [branch_name] | Delete the local branch
 git branch -D [branch_name] | The same, but force
-git push origin --delete [branch_name] | Delete the remote branch
+git push origin -d [branch_name] | Delete the remote branch
 
 
-#### notes ####
-**[remote_name]** - by default you have only one remote repository named 'origin'  
-**[branch_name]** - typically consists of two parts ('feature/ASD-4385-workflow-for-shop', 'bugfix/ASD-4512')  
-**working copy** - checked out copy of files, it's what you see and edit  
-**head**  - reference to the current (base) commit of your working copy  
+## git terms ##
+
+Term | Description
+--- | ---
+[remote_name] | By default you have only one remote repository named 'origin'  
+[branch_name] | Typically consists of two parts ('feature/ASD-4385-workflow-for-shop', 'bugfix/ASD-4512')  
+working copy | Checked out copy of files, it's what you see and edit  
+head | Reference to the current (base) commit of your working copy  
 
 
 ## git file commands ##
@@ -50,7 +53,7 @@ git commit --amend | TO DESCRIBE
 git cherry-pick | TO DESCRIBE
 git remote prune origin | TO DESCRIBE
 git branch [branch_name] [commit_hash] | Create new local branch for a specfic commit
-git checkout -b [branch_name] [commit_hash] | The same, but switch to it
+git checkout -b [branch_name] [commit_hash] | The same, but also switch to it
 git branch -f [branch_name] [commit_hash] | Move tip of local branch to the specific commit, <br> you will lose commits if there is no another branch containing them
 git revert | TO DESCRIBE
 
@@ -59,6 +62,7 @@ git revert | TO DESCRIBE
 Command | Description
 --- | ---
 git merge | TO DESCRIBE
+git merge --abort | TO DESCRIBE
 git rebase | TO DESCRIBE
 
 
@@ -66,11 +70,12 @@ git rebase | TO DESCRIBE
 
 Command | Description
 --- | ---
+git log -3 --stat --pretty=format:"%h - %an (%ar): %s" | Show last 3 commits with file statistics
+git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with text 'strange bug'
 git tag --list --contains d485e45 | Show all tags containing given commit
-git log --pretty=format:"%h - %an, %ar: %s" \| grep 'strange' | Show all commits with word 'strange'
 
 
-#### How to check if one commit contains another commit (copy-paste to shell) ####
+#### How to check if one commit contains another commit (copy-paste it to shell) ####
 ```bash
 parent=d485e45; child=9dcd29d; echo; echo -n "Result: commit" $parent;\
 if (git merge-base --is-ancestor $parent $child);\
