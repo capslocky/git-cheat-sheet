@@ -1,3 +1,5 @@
+# git cheet sheet #
+
 ## git basic commands ##
 
 Command | Description
@@ -6,13 +8,14 @@ git clone [url] | Download remote repository and checkout master branch
 git checkout --track origin [branch_name] | Create local branch based on existing remote branch <br> (and set as upstream)
 git checkout -b [branch_name] | Create new local branch and switch to it
 git checkout [branch_name] | Switch to another local branch
-git status | Show current branch and changed files
+git status | Show current branch, changed files and ahead/behind status
 git status -sb | The same, but shortly
 git commit -m "[message]" | Create new local commit from index
-git push -u origin head | Send current local branch as **new** branch for remote <br> (and set as upstream)
+git push -u origin head | Send current local branch as **new** remote branch <br> (and set as upstream)
 git push | Send new local commits of the current branch to its <br> **existing** upstream branch
 git push -f [remote_name] [branch_name] | The same, but force and explicitly
 git fetch | Download new commits of all remote branches (updating references)
+git fetch --tags | The same, but with tags as well
 git pull | Download and apply (merge) new commits to the current branch
 git pull --rebase | The same, but using rebase instead of merge
 git branch -d [branch_name] | Delete the local branch
@@ -26,11 +29,12 @@ Term | Description
 --- | ---
 [remote_name] | Remote repository (by default you have only one named 'origin')
 [branch_name] | Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-workflow-for-shop', 'bugfix/ASD-4512')
-branch tip (head) | Is a last commit of the branch <br> (manually moved reference, typically by commit or pull)
+branch tip (head) | Is a last commit of the branch. As for local branches - manually moved reference <br> (typically by commit or pull)
 head | Automatic reference to the current (base) commit of your working copy
-upstream (or remote-tracking) branch | Automatic reference to the remote branch, typically with the same name <br> ('origin/bugfix/ASD-4512'), to push/pull local commits from
-working copy | Your current state of files, it's what you see and edit
 detached head | When your current commit is not a tip of any branch
+remote branch | Remote repository branch, automatically updated reference (by fetch)
+upstream (or remote-tracking) branch | Linked remote branch, typically with the same name ('origin/bugfix/ASD-4512'), <br> to push/pull local branch commits from
+working copy | Your current state of files, it's what you see and edit
 index (staged files) | Next commit will be created from this set of changes
 ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream
 fast-forward | If you merge commits from another branch to your current branch, <br> and your branch is completely behind it (ahead is 0), <br> there is no need in merge commit, just current branch tip is lifted up (by default)
@@ -56,8 +60,8 @@ git stash pop | TO DESCRIBE
 
 Command | Description
 --- | ---
-git commit --amend | TO DESCRIBE
-git cherry-pick | TO DESCRIBE
+git commit --amend --no-edit | Add changes to the last commit from index without message editing
+git cherry-pick [commit_hash] | TO DESCRIBE
 git remote prune origin | TO DESCRIBE
 git branch [branch_name] [commit_hash] | Create new local branch for a specfic commit
 git checkout -b [branch_name] [commit_hash] | The same, but also switch to it
@@ -79,14 +83,17 @@ git rebase | TO DESCRIBE
 Command | Description
 --- | ---
 git cherry -v | Show local commits yet to be pushed to upstream
-git branch -v | Show all local branches with respective tip commits and ahead/behind info
+git branch -v | Show all local branches with respective tip commits <br> and ahead/behind status
 git branch --no-merged develop | Show all local branches not merged to develop branch
 git branch --merged develop | Show all local branches merged to develop branch
 git branch --merged develop -r | The same, but for remote branches <br> (-a to see both remote and local)
 git log -3 --stat --pretty=format:"%h - %an (%ar): %s" | Show last 3 commits with file statistics
 git log head..origin --pretty=format:"%h - %an (%ar): %s" | Show all new commits from upstream
 git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with text 'strange bug'
+git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js\* | Show all commits affecting file 'ShopController.js'
 git tag --list --contains d485e45 | Show all tags containing given commit
+git rev-list --left-right --count [branch_name_1]...[branch_name_2] | Count unique commits between two branches
+git blame | TO DESCRIBE
 
 
 #### How to check if one commit contains another commit (copy-paste it to shell) ####
