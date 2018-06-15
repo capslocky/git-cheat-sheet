@@ -13,10 +13,10 @@ git status -sb | The same, but shortly
 git commit -m "[message]" | Create new local commit from index
 git push -u origin head | Send current local branch as **new** remote branch <br> (and set as upstream)
 git push | Send new local commits of the current branch to its <br> **existing** upstream branch
-git push -f [remote_name] [branch_name] | The same, but force and explicitly
+git push -f [remote_name] [branch_name] | The same, but with forced overwrite and explicit names
 git fetch | Download new commits of all remote branches (updating references)
 git fetch --tags | The same, but with tags as well
-git pull | Download and apply (merge) new commits to the current branch
+git pull | Download and merge new commits to the current branch from its upstream
 git pull --rebase | The same, but using rebase instead of merge
 git branch -d [branch_name] | Delete the local branch
 git branch -D [branch_name] | The same, but force
@@ -28,17 +28,18 @@ git push origin -d [branch_name] | Delete the remote branch on remote repository
 Term | Description
 --- | ---
 [remote_name] | Remote repository (by default you have only one named 'origin')
-[branch_name] | Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-workflow-for-shop', 'bugfix/ASD-4512')
-branch tip (head) | Is a last commit of the branch. As for local branches - manually moved reference <br> (typically by commit or pull)
+[branch_name] | Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
+branch tip (head) | Is a last commit of the branch. <br> As for local branches - manually moved reference (typically by commit and pull)
 head | Automatic reference to the current (base) commit of your working copy
 detached head | When your current commit is not a tip of any branch
 remote branch | Remote repository branch, automatically updated reference (by fetch)
-upstream (or remote-tracking) branch | Linked remote branch, typically with the same name ('origin/bugfix/ASD-4512'), <br> to push/pull local branch commits from
+upstream (or remote-tracking) branch | Linked remote branch, typically with the same name + remote prefix: <br> 'origin/bugfix/ASD-4512', to push/pull local branch commits from
+tag | Fixed reference to the fixed commit, typically to mark concrete release, like 'v1.8.5-rc2'
 working copy | Your current state of files, it's what you see and edit
 index (staged files) | Next commit will be created from this set of changes
-ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream
-fast-forward | If you merge commits from another branch to your current branch, <br> and your branch is completely behind it (ahead is 0), <br> there is no need in merge commit, just current branch tip is lifted up (by default)
-dangling (orphan, lost) commit | Commit that isn't a part of any branch or tag (not visible in gui client). <br> But still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' <br> or by creating new branch for that commit
+ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream. All others are common.
+fast-forward | If you merge commits from another branch to your current branch, <br> and your branch is completely behind it (ahead is 0), <br> there is no need in merge commit, current branch tip is just lifted up (by default)
+dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client). <br> But still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' <br> or by creating new branch for that commit
 
 ## git file commands ##
 
@@ -83,7 +84,7 @@ git rebase | TO DESCRIBE
 Command | Description
 --- | ---
 git cherry -v | Show local commits yet to be pushed to upstream
-git branch -v | Show all local branches with respective tip commits <br> and ahead/behind status
+git branch -v | Show all local branches with respective tip commits and ahead/behind status
 git branch --no-merged develop | Show all local branches not merged to develop branch
 git branch --merged develop | Show all local branches merged to develop branch
 git branch --merged develop -r | The same, but for remote branches <br> (-a to see both remote and local)
@@ -92,7 +93,7 @@ git log head..origin --pretty=format:"%h - %an (%ar): %s" | Show all new commits
 git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with text 'strange bug'
 git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js\* | Show all commits affecting file 'ShopController.js'
 git tag --list --contains d485e45 | Show all tags containing given commit
-git rev-list --left-right --count [branch_name_1]...[branch_name_2] | Count unique commits between two branches
+git rev-list --left-right --count [branch_name_1]...[branch_name_2] | Display ahead/behind between two given branches
 git blame | TO DESCRIBE
 
 
@@ -129,6 +130,8 @@ git config --global user.name "[firstname lastname]" | Set your default name acr
 git config --global user.email "[your_email@site.com]" | Set your default e-mail
 git config --global push.default current | TO DESCRIBE
 git fsck  | Checks local repo integrity
+diff.renameLimit | TO DESCRIBE
+merge.renameLimit | TO DESCRIBE
 
 ## git tips ##
 * You can easily clone your local repo into another local folder
@@ -146,7 +149,7 @@ git fsck  | Checks local repo integrity
 * Much less chance to involve your repo into 'bad' state and much easier to fix it
 * You always have the shell and can rely on it
 * You can introduce aliases and scripts for frequent operations
-* You directly interact with repository (useful shell output, no gui bugs)
+* You directly interact with repository (useful shell output, no gui bugs or stuck)
 * You better understand how git works
 * You will be cool
 
