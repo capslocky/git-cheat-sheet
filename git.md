@@ -12,7 +12,7 @@ git status | Show current branch, changed files and ahead/behind status
 git status -sb | The same, but shortly
 git commit -m "[message]" | Create new local commit from index
 git push -u origin head | Send current local branch as **new** remote branch <br> (and set as upstream)
-git push | Send new local commits of the current branch to its <br> **existing** upstream branch
+git push | Send new local commits of the current branch to its <br> **existing** upstream branch (remote expects fast-forward)
 git push -f [remote_name] [branch_name] | The same, but with forced overwrite and explicit names
 git fetch | Download new commits of all remote branches withoug merging <br> (updating references to remote branches)
 git fetch --tags | The same, but with tags as well
@@ -22,34 +22,37 @@ git branch -d [branch_name] | Delete the local branch
 git branch -D [branch_name] | The same, but force
 git push origin -d [branch_name] | Delete the remote branch on remote repository
 
+Note: you interact with remote repository only if perform 'clone', 'fetch', 'pull' or 'push'.
+
 
 ## git terms ##
 
 Term | Description
 --- | ---
-commit | Fixed snapshot which describes complete and certain state of the project (not changeset!) <br> with entire previous snapshot history. It has unique SHA-1 hash, arbitrary name, author, committer, date and parent commits.
-branch | An independent line of development which moves up with appropriate commits.
-[branch_name] | Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
-branch tip (head) | Is a last commit of the branch. <br> As for local branches - manually moved reference (typically by commit and pull)
-head (HEAD) | Automatic reference to the current (base) commit of your working copy
-detached head | When your current commit is not a tip of any branch
+commit | Fixed snapshot which describes complete and certain state of the project (not changeset!) <br> with entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and parent commits
+[commit_hash] | Unique identifier of commit, principal way to refer certain project state. <br> Look like 0c1f78f, which is short form, first 7 chars of full value <br> 0c1f78f3261366277b3d737f4ee98768936a85e2 - SHA-1 hash from every data mentioned above
+branch | An independent line of development which grows by appending new commits
+branch tip (head) | Is a last commit of the branch. <br> Tip of local branch typically gets promoted by commit and pull, <br> whereas tip of remote branche - by fetch and push
+[branch_name] | Just a reference to branch tip. Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
+head (HEAD) | Automatic reference to the current (base, last) commit of your working copy
+working copy (tree) | Your current state of files, it's what you see and edit. HEAD + uncommitted changes
+checkout | Make working copy represent given commit (typically by branch name)
+detached head | When your HEAD is not a tip of any branch
 [remote_name] | Remote repository (by default you have only one named 'origin')
-remote branch | Remote repository branch, automatically updated reference (by fetch)
+remote branch | Remote repository branch
 upstream (or remote-tracking) branch | Linked remote branch, typically with the same name + remote prefix: <br> 'origin/bugfix/ASD-4512', to push/pull local branch commits from
 master branch | The only branch presenting in every git repository from the beginning, <br> typically holds production-ready code
 develop branch | Permanent branch with latest developed features for the next release
 feature branch | Temporary branch for separate developing of concrete feature
 release branch | Temporary branch targeting preparation of concrete release 
 hotfix branch | Temporary branch for fixing bug found on production
-tag | Fixed reference to the fixed commit, typically to mark concrete release, <br> like 'v1.8.5-rc2'
-working copy (tree) | Your current state of files, it's what you see and edit. HEAD + uncommitted changes.
-checkout | Updating of working copy to the given commit (typically by branch name)
-merge commit | TO DESCRIBE
+tag | Fixed reference to the fixed commit, <br> typically to mark certain release, like 'v1.8.5-rc2'
 index (staged files) | Next commit will be created from this set of changes
 ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream. All others are common.
 fast-forward | Special case of merge, when you merge commits from another branch <br> to your current branch, and your branch is completely behind it (ahead is 0, behind > 0), <br> there is no need in merge commit, current branch tip is just lifted up (by default)
-dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client). <br> But still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' <br> or by creating new branch for that commit
-patch | A commit exported to text format
+dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' <br> or by creating new branch for that commit
+patch | A single set of changes (typically output of git diff) exported to text file
+merge commit | TO DESCRIBE
 merge conflict | TO DESCRIBE
 pull request | TO DESCRIBE
 gitflow workflow | TO DESCRIBE
@@ -83,6 +86,9 @@ git checkout -b [branch_name] [commit_hash] | The same, but also switch to it
 git branch -f [branch_name] [commit_hash] | Move tip of local branch to the specific commit <br> Warning: orphan commits can arise
 git revert | TO DESCRIBE
 git rebase -i head~3 | TO DESCRIBE
+git pull --ff-only | TO DESCRIBE
+git diff f48209a 07f27f4 > some.patch | TO DESCRIBE
+git apply some.patch | TO DESCRIBE
 
 ## git merging ##
 Command | Description
@@ -105,11 +111,15 @@ git branch --merged develop -r | The same, but for remote branches <br> (-a to s
 git log -3 --stat --pretty=format:"%h - %an (%ar): %s" | Show last 3 commits with file statistics
 git log head..origin --pretty=format:"%h - %an (%ar): %s" | Show all new commits from upstream
 git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with text 'strange bug'
-git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js\* | Show all commits affecting file 'ShopController.js'
+git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js | Show all commits affecting file 'ShopController.js'
 git tag --list --contains d485e45 | Show all tags containing given commit
-git rev-list --left-right --count [branch_name_1]...[branch_name_2] | Display ahead/behind between two given branches
+git rev-list --left-right <br> --count [branch_name_1]...[branch_name_2] | Display ahead/behind between two given branches
 git blame | TO DESCRIBE
-
+git diff | Show only non-staged changes (difference between working copy and index)
+git diff --staged | Show only staged changes (difference between index and last commit), the same as 'git diff --cached'
+git diff head | Show all uncommitted changes (difference between working copy and last commit)
+git diff develop --staged -- \*ShopController.js | Show changes regarding specific file between index and develop
+git diff --name-only [other_args] | Show only file names
 
 #### How to check if one commit contains another commit (copy-paste it to shell) ####
 ```bash
@@ -124,7 +134,7 @@ echo -n "a parent for commit" $child; echo;
 
 Command | Description
 --- | ---
-git reset --hard head | Discard all uncommitted changes in current branch (reset to last local commit)
+git reset --hard head | Discard all uncommitted changes in working copy (reset to last local commit)
 git reset --hard [commit_hash] | Reset current branch to the given commit. Warning: orphan commits can arise
 git reset --hard origin/[branch_name] | The same, but by remote branch name
 git reset --soft head~1 | Disassemble last commit into index (with preserving all local changes)
@@ -147,7 +157,9 @@ git fsck  | Checks local repo integrity
 diff.renameLimit | TO DESCRIBE
 merge.renameLimit | TO DESCRIBE
 
+
 ## git tips ##
+* Because [branch_name], [tag_name], HEAD are just only a references to [commit_hash], you can use one in place of another
 * You can easily clone your local repo into another local folder
 * Moreover you can add one local repo as a remote for another
 * Before performing some operations (like big rebase) do create and store a separate backup branch
@@ -155,6 +167,7 @@ merge.renameLimit | TO DESCRIBE
 * You can use aliases - TO DESCRIBE
 * How to exit vim text editor: with saving changes - just type [ESC :wq], without saving [ESC :q!]
 * Prefer SSD over HDD to boost git operation performance
+
 
 ## why use git shell? ##
 * You just can't execute most of operations with gui client
@@ -166,6 +179,12 @@ merge.renameLimit | TO DESCRIBE
 * You directly interact with repository (useful shell output, no gui bugs or stuck)
 * You better understand how git works
 * You will be cool
+
+
+## interesting things about git ##
+* git was created by Linus Torvalds back in 2005 for Linux kernel development specifically
+* repository can have more than 1 root (inital) commit, there are 4 in Linux kernel
+* octopus merge is a merge from more than 2 parent commits, it inspired octocat - mascot of GitHub
 
 
 ## git links ##
