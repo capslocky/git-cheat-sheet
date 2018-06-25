@@ -5,7 +5,7 @@
 Command | Description
 --- | ---
 git clone [url] | Download remote repository and checkout master branch
-git checkout --track origin [branch_name] | Create local branch based on existing remote branch <br> (and set as upstream)
+git checkout --track origin [branch_name] | Create local branch as a copy of existing remote branch <br> (and set as upstream)
 git checkout -b [branch_name] | Create new local branch and switch to it
 git checkout [branch_name] | Switch to another local branch
 git status | Show current branch, changed files and ahead/behind status
@@ -14,34 +14,35 @@ git commit -m "[message]" | Create new local commit from index
 git push -u origin head | Send current local branch as **new** remote branch <br> (and set as upstream)
 git push | Send new local commits of the current branch to its <br> **existing** upstream branch (remote expects fast-forward)
 git push -f [remote_name] [branch_name] | The same, but with forced overwrite and explicit names
-git fetch | Download new commits of all remote branches withoug merging <br> (updating references to remote branches)
+git fetch | Download new commits of all remote branches without merging <br> (just updating local references to remote branches)
 git fetch --tags | The same, but with tags as well
 git pull | Download and merge new commits to the current branch from its upstream <br> (fast-forward possible here)
 git pull --rebase | The same, but using rebase instead of merge
 git branch -d [branch_name] | Delete the local branch
 git branch -D [branch_name] | The same, but force
 git push origin -d [branch_name] | Delete the remote branch on remote repository
+git init | Initialize current directory as a new empty git repository
 
-Note: you interact with remote repository only if perform 'clone', 'fetch', 'pull' or 'push'.
+Note: you interact with remote repository only in case of 'clone', 'fetch', 'pull' or 'push', all other operations don't need connection
 
 
 ## git terms ##
 
 Term | Description
 --- | ---
-commit | Fixed snapshot which describes complete and certain state of the project (not changeset!) <br> with entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and parent commits
-[commit_hash] | Unique identifier of commit, principal way to refer certain project state. <br> Look like 0c1f78f, which is short form, first 7 chars of full value <br> 0c1f78f3261366277b3d737f4ee98768936a85e2 - SHA-1 hash from every data mentioned above
-branch | An independent line of development which grows by appending new commits
-branch tip (head) | Is a last commit of the branch. <br> Tip of local branch typically gets promoted by commit and pull, <br> whereas tip of remote branche - by fetch and push
-[branch_name] | Just a reference to branch tip. Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
-head (HEAD) | Automatic reference to the current (base, last) commit of your working copy
+commit | Fixed snapshot which describes complete and certain state of the project (not changeset!) <br> with entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and references its parent commits
+[commit_hash] | Unique identifier of any commit, the principal way to refer certain project state. <br> Looks like f5b5e37, which is a short form - first 7 chars of full value <br> f5b5e3719202bc5a78d97fc48aa089ca3034ce04 <br> - calculated as SHA-1 hash from every data mentioned above
+branch | An independent line of development which "grows" by appending new commits
+branch tip (head) | Is a last commit of the branch. <br> The tip of local branch gets promoted by performing commit and pull, <br> whereas tip of remote branch - by fetch and push
+[branch_name] | Just a reference to branch tip (local or remote). Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
 working copy (tree) | Your current state of files, it's what you see and edit. HEAD + uncommitted changes
+head (HEAD) | Automatic reference to the current (base, last) commit of your working copy
 checkout | Make working copy represent given commit (typically by branch name)
 detached head | When your HEAD is not a tip of any branch
 [remote_name] | Remote repository (by default you have only one named 'origin')
-remote branch | Remote repository branch
-upstream (or remote-tracking) branch | Linked remote branch, typically with the same name + remote prefix: <br> 'origin/bugfix/ASD-4512', to push/pull local branch commits from
-master branch | The only branch presenting in every git repository from the beginning, <br> typically holds production-ready code
+remote branch | Remote repository branch, just a local reference, always contains remote prefix ('origin/develop')
+upstream (or remote-tracking) branch | Linked remote branch, typically with the same name: <br> 'origin/bugfix/ASD-4512', to push/pull local branch commits from
+master branch | The only branch existing in every git repository from the beginning, <br> typically holds production-ready code
 develop branch | Permanent branch with latest developed features for the next release
 feature branch | Temporary branch for separate developing of concrete feature
 release branch | Temporary branch targeting preparation of concrete release 
@@ -51,12 +52,15 @@ index (staged files) | Next commit will be created from this set of changes
 ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream. All others are common.
 fast-forward | Special case of merge, when you merge commits from another branch <br> to your current branch, and your branch is completely behind it (ahead is 0, behind > 0), <br> there is no need in merge commit, current branch tip is just lifted up (by default)
 dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' <br> or by creating new branch for that commit
-patch | A single set of changes (typically output of git diff) exported to text file
-merge commit | TO DESCRIBE
+merge | TO DESCRIBE
+merge commit | Commit with two parent commits (first and second)
 merge conflict | TO DESCRIBE
+rebase | TO DESCRIBE
 pull request | TO DESCRIBE
 gitflow workflow | TO DESCRIBE
 bare repository | TO DESCRIBE
+patch | A single set of changes (typically output of git diff) exported to text file
+
 
 ## git file commands ##
 
@@ -90,6 +94,7 @@ git pull --ff-only | TO DESCRIBE
 git diff f48209a 07f27f4 > some.patch | TO DESCRIBE
 git apply some.patch | TO DESCRIBE
 
+
 ## git merging ##
 Command | Description
 --- | ---
@@ -108,18 +113,22 @@ git branch -v | Show all local branches with respective tip commits and ahead/be
 git branch --no-merged develop | Show all local branches not merged to develop branch
 git branch --merged develop | Show all local branches merged to develop branch
 git branch --merged develop -r | The same, but for remote branches <br> (-a to see both remote and local)
+git remote -v | TO DESCRIBE
 git log -3 --stat --pretty=format:"%h - %an (%ar): %s" | Show last 3 commits with file statistics
 git log head..origin --pretty=format:"%h - %an (%ar): %s" | Show all new commits from upstream
 git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with text 'strange bug'
 git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js | Show all commits affecting file 'ShopController.js'
 git tag --list --contains d485e45 | Show all tags containing given commit
 git rev-list --left-right <br> --count [branch_name_1]...[branch_name_2] | Display ahead/behind between two given branches
+git merge-base [branch_name_1] [branch_name_2] | Show last common parent commit between two given branches
 git blame | TO DESCRIBE
 git diff | Show only non-staged changes (difference between working copy and index)
 git diff --staged | Show only staged changes (difference between index and last commit), the same as 'git diff --cached'
 git diff head | Show all uncommitted changes (difference between working copy and last commit)
 git diff develop --staged -- \*ShopController.js | Show changes regarding specific file between index and develop
 git diff --name-only [other_args] | Show only file names
+git diff --name-status [other_args] | The same, but also file status
+
 
 #### How to check if one commit contains another commit (copy-paste it to shell) ####
 ```bash
@@ -129,7 +138,6 @@ then echo -n " IS "; else echo -n " IS NOT "; fi;\
 echo -n "a parent for commit" $child; echo;
 ```
 
-
 ## git tricks ##
 
 Command | Description
@@ -138,9 +146,31 @@ git reset --hard head | Discard all uncommitted changes in working copy (reset t
 git reset --hard [commit_hash] | Reset current branch to the given commit. Warning: orphan commits can arise
 git reset --hard origin/[branch_name] | The same, but by remote branch name
 git reset --soft head~1 | Disassemble last commit into index (with preserving all local changes)
-git reset --soft [commit_hash] | The same, but to the given commit
 git clean -xdf | Delete all untracked (ignored) files and folders
 git clean -nxdf | Just display what would be deleted
+
+
+## git references ##
+
+Reference | Description
+--- | ---
+[commit_hash] | See git terms
+[branch_name] | See git terms (don't forget about 'origin/[branch_name]')
+[tag_name] | See git terms
+head (HEAD) | See git terms
+[ref] | Any of above, points to certain commit
+[ref]~1 | Take its parent (exactly first one in case if multiple parents)
+[ref]~ | Equal to previous
+[ref]~2 | Take grandparent
+[ref]~~ | Equal to previous
+[ref]~N | Take commit located N steps back in hierarchy
+[ref]^1 | Take exactly first parent, equal to [ref]~1
+[ref]^ |  Equal to previous
+[ref]^2 | Take exactly second parent (only one step back in hierarchy)
+[ref]^N | Take exactly Nth parent (only one step back in hierarchy), see octopus merge
+[ref]^^ | Equal to [ref]~2 (two steps back)
+[ref]\~5^2\~3 | Go 5 commits back, then turn to second parent and then 3 commits back more
+HEAD@{3} | Take previous HEAD location from history 3 transfers back (see git reflog)
 
 
 ## git setup ##
@@ -149,7 +179,6 @@ Command | Description
 --- | ---
 git version | Show your git version
 which git | Show your git location
-git init | Initialize current directory as a repository
 git config --global user.name "[firstname lastname]" | Set your default name across all repos
 git config --global user.email "[your_email@site.com]" | Set your default e-mail
 git config --global push.default current | TO DESCRIBE
@@ -159,9 +188,10 @@ merge.renameLimit | TO DESCRIBE
 
 
 ## git tips ##
-* Because [branch_name], [tag_name], HEAD are just only a references to [commit_hash], you can use one in place of another
-* You can easily clone your local repo into another local folder
-* Moreover you can add one local repo as a remote for another
+* Because [commit_hash], [branch_name], HEAD, etc. are just only references, you can use one in place of another
+* Local branches, remote branches, remote urls are stored as easy-to-edit text files in .git folder
+* You can clone (instead of just copy) your local repo into another local folder (and probably fix origin after it)
+* You can add one existing local repo as a remote for another
 * Before performing some operations (like big rebase) do create and store a separate backup branch
 * Close and open gui client if no changes visible there
 * You can use aliases - TO DESCRIBE
@@ -182,9 +212,9 @@ merge.renameLimit | TO DESCRIBE
 
 
 ## interesting things about git ##
-* git was created by Linus Torvalds back in 2005 for Linux kernel development specifically
-* repository can have more than 1 root (inital) commit, there are 4 in Linux kernel
-* octopus merge is a merge from more than 2 parent commits, it inspired octocat - mascot of GitHub
+* Git was created by Linus Torvalds back in 2005 for Linux kernel development collaboration specifically
+* Repository can have more than 1 root (inital) commit, there are 4 in Linux kernel
+* Octopus merge is a merge from more than 2 parent commits, it inspired octocat - mascot of GitHub
 
 
 ## git links ##
