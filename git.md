@@ -53,7 +53,7 @@ ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <
 fast-forward | Special case of merge, when you merge commits from another branch <br> to your current branch, and your branch is completely behind it (ahead is 0, behind > 0), <br> there is no need in merge commit, current branch tip is just lifted up (by default)
 dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' <br> or by creating new branch for that commit
 merge | TO DESCRIBE
-merge commit | Commit with two parent commits (first and second)
+merge commit | Commit with two parent commits (first - direct one and second - tip of merged branch)
 merge conflict | TO DESCRIBE
 rebase | TO DESCRIBE
 pull request | TO DESCRIBE
@@ -116,7 +116,7 @@ git branch --merged develop -r | The same, but for remote branches <br> (-a to s
 git remote -v | TO DESCRIBE
 git log -3 --stat --pretty=format:"%h - %an (%ar): %s" | Show last 3 commits with file statistics
 git log head..origin --pretty=format:"%h - %an (%ar): %s" | Show all new commits from upstream
-git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with text 'strange bug'
+git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with message 'strange bug'
 git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js | Show all commits affecting file 'ShopController.js'
 git tag --list --contains d485e45 | Show all tags containing given commit
 git rev-list --left-right <br> --count [branch_name_1]...[branch_name_2] | Display ahead/behind between two given branches
@@ -158,19 +158,22 @@ Reference | Description
 [branch_name] | See git terms (don't forget about 'origin/[branch_name]')
 [tag_name] | See git terms
 head (HEAD) | See git terms
+HEAD@{1} | Take previous HEAD location
+HEAD@{N} | Take HEAD location from history (see git reflog)
+@{u} | The upstream of current branch: @{upstream}
 [ref] | Any of above, points to certain commit
-[ref]~1 | Take its parent (exactly first one in case if multiple parents)
+[ref]~1 | Take its parent (exactly direct one in case if multiple parents)
 [ref]~ | Equal to previous
 [ref]~2 | Take grandparent
 [ref]~~ | Equal to previous
 [ref]~N | Take commit located N steps back in hierarchy
-[ref]^1 | Take exactly first parent, equal to [ref]~1
+[ref]^1 | Take exactly first parent of merge commit, i.e. direct one, equal to [ref]~1
 [ref]^ |  Equal to previous
-[ref]^2 | Take exactly second parent (only one step back in hierarchy)
-[ref]^N | Take exactly Nth parent (only one step back in hierarchy), see octopus merge
+[ref]^2 | Take exactly second parent of merge commit, i.e. tip of merged branch
+[ref]^N | Take exactly Nth parent (one step back in hierarchy as well), see octopus merge
 [ref]^^ | Equal to [ref]~2 (two steps back)
 [ref]\~5^2\~3 | Go 5 commits back, then turn to second parent and then 3 commits back more
-HEAD@{3} | Take previous HEAD location from history 3 transfers back (see git reflog)
+
 
 
 ## git setup ##
