@@ -8,8 +8,7 @@ git clone [url] | Download remote repository and checkout master branch
 git checkout --track origin [branch_name] | Create local branch as a copy of existing remote branch <br> (and set as upstream)
 git checkout -b [branch_name] | Create new local branch and switch to it
 git checkout [branch_name] | Switch to another local branch
-git status | Show current branch, changed files and ahead/behind status
-git status -sb | The same, but shortly
+git status -sb | Show current branch, changed files and ahead/behind status
 git commit -m "[message]" | Create new local commit from index
 git push -u origin head | Send current local branch as **new** remote branch <br> (and set as upstream)
 git push | Send new local commits of the current branch to its <br> **existing** upstream branch (remote expects fast-forward)
@@ -44,9 +43,9 @@ remote branch | Remote repository branch, works as a local reference, always con
 upstream (or remote-tracking) branch | Linked remote branch, typically with the same name: <br> 'origin/bugfix/ASD-4512', to push/pull local branch commits from
 master branch | The only branch existing in every git repository from the beginning, <br> typically holds production-ready code
 develop branch | Permanent branch with latest developed features for the next release
-feature branch | Temporary branch for separate developing of concrete feature
-release branch | Temporary branch targeting preparation of concrete release 
-hotfix branch | Temporary branch for fixing bug found on production
+feature branch | Temporary branch for separate developing of specific feature
+release branch | Temporary branch targeting preparation of specific release 
+hotfix branch | Temporary branch just for fixing bug found on production
 tag | Fixed reference to the fixed commit, <br> typically to mark certain release, like 'v1.8.5-rc2'
 index (staged files) | Next commit will be created from this set of changes
 ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream. All others are common.
@@ -55,6 +54,7 @@ dangling (orphan, lost) commit | Commit that isn't referenced by any branch or t
 merge | TO DESCRIBE
 merge commit | Commit with two parent commits (first - direct one and second - tip of merged branch)
 merge conflict | TO DESCRIBE
+to amend commit | Recreate last commit as a new commit in order to append more changes or fix its message. <br> Warning: if commit has been pushed and used by other developer, don't do amend
 rebase | TO DESCRIBE
 pull request | TO DESCRIBE
 gitflow workflow | TO DESCRIBE
@@ -84,6 +84,7 @@ Command | Description
 --- | ---
 git reset --hard [commit_hash] | Reset working copy and current branch tip to the given commit. Warning: orphan commits can arise
 git commit --amend --no-edit | Add changes to the last commit from index without message editing
+git commit --amend -m "New commit message" | Change the message of last commit
 git cherry-pick [commit_hash] | TO DESCRIBE
 git remote prune origin | TO DESCRIBE
 git branch [branch_name] [commit_hash] | Create new local branch for a specfic commit
@@ -92,8 +93,7 @@ git branch -f [branch_name] [commit_hash] | Move tip of local branch to the spec
 git revert | TO DESCRIBE
 git rebase -i head~3 | TO DESCRIBE
 git pull --ff-only | TO DESCRIBE
-git diff f48209a 07f27f4 > some.patch | TO DESCRIBE
-git apply some.patch | TO DESCRIBE
+
 
 
 ## git basic combos ##
@@ -102,7 +102,7 @@ Command | Description
 git reset --hard head | Discard all uncommitted changes in working copy (reset to last local commit)
 git reset --hard @{u} | Make working copy and current branch exact as its upstream
 git reset --soft head~1 | Disassemble last commit into index (with preserving all uncommitted changes)
-git commit --amend --no-edit <br> git push -f | Amend and repush last commit. <br> Warning: overwriting of remote branch tip, see git status -sb
+git commit --amend --no-edit <br> git push -f | Amend and repush last commit. <br> Warning: overwriting remote branch tip, see git status -sb
 
 
 ## git merging ##
@@ -124,16 +124,23 @@ git branch --no-merged develop | Show all local branches not merged to develop b
 git branch --merged develop | Show all local branches merged to develop branch
 git branch --merged develop -r | The same, but for remote branches <br> (-a to see both remote and local)
 git remote -v | TO DESCRIBE
-git log -3 --stat --pretty=format:"%h - %an (%ar): %s" | Show last 3 commits with file statistics
-git log head..origin --pretty=format:"%h - %an (%ar): %s" | Show all new commits from upstream
-git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with message 'strange bug'
-git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js | Show all commits affecting file 'ShopController.js'
 git tag --list --contains d485e45 | Show all tags containing given commit
 git rev-list --left-right <br> --count [branch_name_1]...[branch_name_2] | Display ahead/behind between two given branches
 git merge-base [branch_name_1] [branch_name_2] | Show last common parent commit between two given branches
 git describe --tags [commit_hash] | Show the most recent tag among parent commits
 git describe --contains [commit_hash] | Show tag which contains given commit
 git blame | TO DESCRIBE
+
+
+## git log ##
+Command | Description
+--- | ---
+git log -3 --stat --pretty=format:"%h - %an (%ar): %s" | Show last 3 commits with file statistics
+git log head..origin --pretty=format:"%h - %an (%ar): %s" | Show all new commits from upstream
+git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with message 'strange bug'
+git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js | Show all commits affecting file 'ShopController.js'
+git log --author="John" | TO DESCRIBE
+git log -p | Show changes as well
 
 
 ## git diff ##
@@ -144,6 +151,8 @@ git diff --staged | Show only staged changes (difference between index and last 
 git diff head | Show all uncommitted changes (difference between working copy and last commit)
 git diff develop --staged -- \*ShopController.js | Show changes regarding specific file between index and develop
 git diff [commit_hash_1] [commit_hash_2] | Show changes between two given commits
+git diff [commit_hash_1] [commit_hash_2] > some.patch | Dump changes as patch file
+git apply some.patch | Apply that patch file
 git diff --name-only [other_args] | Show only file names
 git diff --name-status [other_args] | The same, but also with file status
 git diff --check | Show any left merge conflict markers and whitespace errors
@@ -166,7 +175,7 @@ Command | Description
 --- | ---
 git clean -xdf | Delete all untracked (ignored) files and folders
 git clean -nxdf | Just display what would be deleted
-
+git archive --format zip --output filename.zip [commit_hash] | Create zip archive of project state according given commit
 
 ## git references ##
 
@@ -220,6 +229,7 @@ merge.renameLimit | TO DESCRIBE
 * You can use aliases - TO DESCRIBE
 * How to exit vim text editor: with saving changes - just type [ESC :wq], without saving [ESC :q!]
 * Prefer SSD over HDD to boost git operation performance
+* 'git help', 'git help pull' - embedded documentation
 
 
 ## why use git shell? ##
@@ -230,7 +240,7 @@ merge.renameLimit | TO DESCRIBE
 * You always have the shell and can rely on it
 * You can introduce aliases and scripts for frequent operations
 * You directly interact with repository (useful shell output, no gui bugs or stuck)
-* You better understand how git works
+* You better understand how git works and get more 'aha!' moments 
 * You will be cool
 
 
