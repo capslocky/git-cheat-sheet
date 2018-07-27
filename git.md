@@ -9,10 +9,10 @@ git checkout --track origin [branch_name] | Create local branch as a copy of exi
 git checkout -b [branch_name] | Create new local branch and switch to it
 git checkout [branch_name] | Switch to another local branch
 git status -sb | Show current branch, changed files and ahead/behind status
-git commit -m "[message]" | Create new local commit from index
+git commit -m '[message]' | Create new local commit from index
 git push -u origin head | Send current local branch as **new** remote branch <br> (and set as upstream)
 git push | Send new local commits of the current branch to its <br> **existing** upstream branch (remote expects fast-forward)
-git push -f [remote_name] [branch_name] | The same, but with forced overwrite and explicit names
+git push -f [remote_name] [branch_name] | The same, but with forced overwrite and explicit names. <br> Warning: remote branch tip overwriting
 git fetch | Download new commits of all remote branches without merging <br> (just updating local references to remote branches)
 git fetch --tags | The same, but with tags as well
 git pull | Download and merge new commits to the current branch from its upstream <br> (fast-forward possible here)
@@ -84,7 +84,7 @@ Command | Description
 --- | ---
 git reset --hard [commit_hash] | Reset working copy and current branch tip to the given commit. Warning: orphan commits can arise
 git commit --amend --no-edit | Add changes to the last commit from index without message editing
-git commit --amend -m "New commit message" | Change the message of last commit
+git commit --amend -m 'New commit message' | Change the message of last commit
 git cherry-pick [commit_hash] | TO DESCRIBE
 git remote prune origin | TO DESCRIBE
 git branch [branch_name] [commit_hash] | Create new local branch for a specfic commit
@@ -93,7 +93,7 @@ git branch -f [branch_name] [commit_hash] | Move tip of local branch to the spec
 git revert | TO DESCRIBE
 git rebase -i head~3 | TO DESCRIBE
 git pull --ff-only | TO DESCRIBE
-
+git branch -u origin/[branch_name] | Set new upstream for current branch
 
 
 ## git basic combos ##
@@ -102,7 +102,7 @@ Command | Description
 git reset --hard head | Discard all uncommitted changes in working copy (reset to last local commit)
 git reset --hard @{u} | Make working copy and current branch exact as its upstream
 git reset --soft head~1 | Disassemble last commit into index (with preserving all uncommitted changes)
-git commit --amend --no-edit <br> git push -f | Amend and repush last commit. <br> Warning: overwriting remote branch tip, see git status -sb
+git commit --amend --no-edit <br> git push -f | Amend and repush last commit. <br> Warning: remote branch tip overwriting, see git status -sb
 
 
 ## git merging ##
@@ -135,19 +135,21 @@ git blame | TO DESCRIBE
 ## git log ##
 Command | Description
 --- | ---
-git log -3 --stat --pretty=format:"%h - %an (%ar): %s" | Show last 3 commits with file statistics
-git log head..origin --pretty=format:"%h - %an (%ar): %s" | Show all new commits from upstream
-git log --grep 'strange bug' --pretty=format:"%h - %an (%ar): %s" | Show all commits with message 'strange bug'
-git log --pretty=format:"%h - %an (%ar): %s" --follow \*ShopController.js | Show all commits affecting file 'ShopController.js'
-git log --author="John" | TO DESCRIBE
-git log -p | Show changes as well
+git log -3 --stat --pretty=format:'%h - %an (%ar): %s' | Show last 3 commits with file statistics
+git log [commit_hash_1]..[commit_hash_2] | Filter by commit range
+git log ..@{u} --pretty=format:'%h - %an (%ar): %s' | Show all new commits from upstream
+git log --grep 'strange bug' --pretty=format:'%h - %an (%ar): %s' | Show all commits with message 'strange bug'
+git log --pretty=format:'%h - %an (%ar): %s' --follow \*ShopController.js | Show all commits affecting file 'ShopController.js'
+git log --author='John' | Filter by author name or email (case-sensitive)
+git log -p | Show the full diff of each commit
+git log --oneline | Show only one line per commit
 
 
 ## git diff ##
 Command | Description
 --- | ---
 git diff | Show only non-staged changes (difference between working copy and index)
-git diff --staged | Show only staged changes (difference between index and last commit), the same as 'git diff --cached'
+git diff --staged | Show only staged changes (difference between index and last commit), the same as `git diff --cached`
 git diff head | Show all uncommitted changes (difference between working copy and last commit)
 git diff develop --staged -- \*ShopController.js | Show changes regarding specific file between index and develop
 git diff [commit_hash_1] [commit_hash_2] | Show changes between two given commits
@@ -186,20 +188,23 @@ Reference | Description
 [tag_name] | See git terms
 head (HEAD) | See git terms
 @ | Equal to HEAD
+@\{u\} | The upstream of current branch: @{upstream}
 HEAD@{1} | Take previous HEAD location
 HEAD@{N} | Take HEAD location from history (see git reflog)
-@{u} | The upstream of current branch: @{upstream}
+@{-1} | Take previous checked out branch
+\- | The same, but only in `git checkout -` and `git merge -`
+@{-N} | Take N-th last checked out branch
 MERGE_HEAD | During merge, the tip of merged branch
 [ref] | Any of above, points to certain commit
 [ref]~1 | Take its parent (exactly direct one in case if multiple parents)
-[ref]~ | Equal to previous
+[ref]~ | The same
 [ref]~2 | Take grandparent
-[ref]~~ | Equal to previous
+[ref]~~ | The same
 [ref]~N | Take commit located N steps back in hierarchy
 [ref]^1 | Take exactly first parent of merge commit, i.e. direct one, equal to [ref]~1
-[ref]^ |  Equal to previous
+[ref]^ |  The same
 [ref]^2 | Take exactly second parent of merge commit, i.e. tip of merged branch
-[ref]^N | Take exactly Nth parent (one step back in hierarchy as well), see octopus merge
+[ref]^N | Take exactly Nth parent (one step back in hierarchy anyway), see octopus merge
 [ref]^^ | Equal to [ref]~2 (two steps back)
 [ref]\~5^2\~3 | Go 5 commits back, then turn to second parent and then 3 commits back more
 
@@ -211,9 +216,11 @@ Command | Description
 --- | ---
 git version | Show your git version
 which git | Show your git location
-git config --global user.name "[firstname lastname]" | Set your default name across all repos
-git config --global user.email "[your_email@site.com]" | Set your default e-mail
+git config --global user.name '[firstname lastname]' | Set your default name across all repos
+git config --global user.email '[your_email@site.com]' | Set your default e-mail
 git config --global push.default current | TO DESCRIBE
+git config --global alias.f '!git fetch && git status -sb' | Create an alias 'git f' for given git commands
+git config --global -e | Open global git config file in text editor
 git fsck  | Checks local repo integrity
 diff.renameLimit | TO DESCRIBE
 merge.renameLimit | TO DESCRIBE
