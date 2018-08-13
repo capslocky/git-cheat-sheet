@@ -5,21 +5,21 @@
 Command | Description
 --- | ---
 git clone [url] | Download remote repository and checkout master branch
-git checkout --track origin [branch_name] | Create local branch as a copy of existing remote branch <br> (and set as upstream)
+git checkout --track origin/[branch_name] | Create local branch as a copy of existing remote branch <br> (and set as upstream)
 git checkout -b [branch_name] | Create new local branch and switch to it
 git checkout [branch_name] | Switch to another local branch
 git status -sb | Show current branch, changed files and ahead/behind status
 git commit -m '[message]' | Create new local commit from index
-git push -u origin head | Send current local branch as **new** remote branch <br> (and set as upstream)
+git push -u origin HEAD | Send current local branch as **new** remote branch <br> (and set as upstream)
 git push | Send new local commits of the current branch to its <br> **existing** upstream branch (remote expects fast-forward)
 git push -f [remote_name] [branch_name] | The same, but with forced overwrite and explicit names. <br> Warning: remote branch tip overwriting
 git fetch | Download new commits of all remote branches without merging <br> (just updating local references to remote branches)
 git fetch --tags | The same, but with tags as well
-git pull | Download and merge new commits to the current branch from its upstream <br> (fast-forward possible here)
+git pull | Download and merge new commits to the current branch from its <br> upstream (fast-forward possible here)
 git pull --rebase | The same, but using rebase instead of merge
 git branch -d [branch_name] | Delete the local branch
 git branch -D [branch_name] | The same, but force
-git push origin -d [branch_name] | Delete the remote branch on remote repository
+git push origin -delete [branch_name] | Delete the remote branch on remote repository
 git init | Initialize current directory as a new empty git repository
 
 Note: you interact with remote repository only in case of 'clone', 'fetch', 'pull' or 'push', all other operations are local and don't need network connection
@@ -29,15 +29,15 @@ Note: you interact with remote repository only in case of 'clone', 'fetch', 'pul
 
 Term | Description
 --- | ---
-commit | Fixed snapshot which describes complete and certain state of the project (not changeset!) <br> with entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and references its parent commits
-[commit_hash] | Unique identifier of any commit, the principal way to refer certain project state. <br> Looks like f5b5e37, which is a short form - just a unique substring of full value <br> f5b5e3719202bc5a78d97fc48aa089ca3034ce04 <br> - calculated as SHA-1 hash from every data mentioned above. Short form can have different length.
+commit | Fixed (immutable) snapshot which describes complete and certain state of the project (not changeset!) <br> with entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and references its parent commits
+[commit_hash] | Unique identifier of any commit, the principal way to refer certain project state. <br> Looks like f5b5e37, which is a short form - just a unique substring of full value <br> f5b5e3719202bc5a78d97fc48aa089ca3034ce04 - calculated as SHA-1 hash from every data mentioned above. Short form can have different length.
 branch | An independent line of development which "grows" by appending new commits
-branch tip (head) | Is a last commit of the branch. <br> The tip of local branch gets promoted by performing commit and pull, <br> whereas tip of remote branch - by fetch and push
+branch tip (HEAD) | Is a last commit of the branch. <br> The tip of local branch gets promoted by performing commit and pull. <br> Whereas tip of remote branch - by fetch and push
 [branch_name] | Just a reference to branch tip (local or remote). Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
 working copy (tree) | Your current state of files, it's what you see and edit. HEAD + uncommitted changes
-head (HEAD) | Automatic reference to the current (base, last) commit of your working copy
+HEAD | Automatic reference to the current (base, last) commit of your working copy
 checkout | Make working copy represent given commit (typically by branch name)
-detached head | When your HEAD is not a tip of any branch
+detached HEAD | When your HEAD is not a tip of any branch
 [remote_name] | Remote repository (by default you have only one named 'origin')
 remote branch | Remote repository branch, works as a local reference, always contains remote prefix ('origin/develop')
 upstream (or remote-tracking) branch | Linked remote branch, typically with the same name: <br> 'origin/bugfix/ASD-4512', to push/pull local branch commits from
@@ -67,7 +67,7 @@ patch | A single set of changes (typically output of git diff) exported to text 
 Command | Description
 --- | ---
 git add [file_name] | Add the file change to the index (staging)
-git add . | Add all changes to the index
+git add -A | Add all changes to the index
 git reset [file_name] | Move the file change out of index (unstaging)
 git reset | Unstage all the changes
 git rm [file_name] | Remove committed file
@@ -82,16 +82,17 @@ git stash pop | TO DESCRIBE
 
 Command | Description
 --- | ---
-git reset --hard [commit_hash] | Reset working copy and current branch tip to the given commit. Warning: orphan commits can arise
+git reset --hard [commit_hash] | Reset working copy and current branch tip to the given commit. <br> Warning: orphan commits may appear
 git commit --amend --no-edit | Add changes to the last commit from index without message editing
 git commit --amend -m 'New commit message' | Change the message of last commit
-git cherry-pick [commit_hash] | TO DESCRIBE
+git cherry-pick [commit_hash] | Copy given commit into current branch (copy changes)
+git cherry-pick [commit_hash_1]^..[commit_hash_2] | The same but take multiple commits from given range
 git remote prune origin | TO DESCRIBE
 git branch [branch_name] [commit_hash] | Create new local branch for a specfic commit
 git checkout -b [branch_name] [commit_hash] | The same, but also switch to it
-git branch -f [branch_name] [commit_hash] | Move tip of local branch to the specific commit <br> Warning: orphan commits can arise
+git branch -f [branch_name] [commit_hash] | Move tip of local branch to the specific commit <br> Warning: orphan commits may appear
 git revert | TO DESCRIBE
-git rebase -i head~3 | TO DESCRIBE
+git rebase -i HEAD~3 | TO DESCRIBE
 git pull --ff-only | TO DESCRIBE
 git branch -u origin/[branch_name] | Set new upstream for current branch
 
@@ -99,9 +100,9 @@ git branch -u origin/[branch_name] | Set new upstream for current branch
 ## git basic combos ##
 Command | Description
 --- | ---
-git reset --hard head | Discard all uncommitted changes in working copy (reset to last local commit)
+git reset --hard HEAD | Discard all uncommitted changes in working copy (reset to last local commit)
 git reset --hard @{u} | Make working copy and current branch exact as its upstream
-git reset --soft head~1 | Disassemble last commit into index (with preserving all uncommitted changes)
+git reset --soft HEAD~1 | Disassemble last commit into index (with preserving all uncommitted changes)
 git commit --amend --no-edit <br> git push -f | Amend and repush last commit. <br> Warning: remote branch tip overwriting, see git status -sb
 
 
@@ -135,14 +136,17 @@ git blame | TO DESCRIBE
 ## git log ##
 Command | Description
 --- | ---
-git log -3 --stat --pretty=format:'%h - %an (%ar): %s' | Show last 3 commits with file statistics
-git log [commit_hash_1]..[commit_hash_2] | Filter by commit range
-git log ..@{u} --pretty=format:'%h - %an (%ar): %s' | Show all new commits from upstream
-git log --grep 'strange bug' --pretty=format:'%h - %an (%ar): %s' | Show all commits with message 'strange bug'
-git log --pretty=format:'%h - %an (%ar): %s' --follow \*ShopController.js | Show all commits affecting file 'ShopController.js'
+git log -10 --pretty=format:'%h - %<(20)%an \| %<(14)%ar \| %s' | Show last 10 commits with pretty formatting
+git log [commit_hash_1]..[commit_hash_2] | Show given commit range
+git log HEAD..@{u} | Show all new commits from upstream
+git log --grep 'strange bug'  | Filter by commit message containing text 'strange bug'
+git log --follow \*ShopController.js | Filter by affecting file 'ShopController.js'
 git log --author='John' | Filter by author name or email (case-sensitive)
+git log HEAD~100..HEAD -S 'console.log(' | Filter by changed source code text 'console.log('
 git log -p | Show the full diff of each commit
 git log --oneline | Show only one line per commit
+git log --stat | Show file change statistics
+git log --first-parent | TO DESCRIBE
 
 
 ## git diff ##
@@ -150,7 +154,7 @@ Command | Description
 --- | ---
 git diff | Show only non-staged changes (difference between working copy and index)
 git diff --staged | Show only staged changes (difference between index and last commit), the same as `git diff --cached`
-git diff head | Show all uncommitted changes (difference between working copy and last commit)
+git diff HEAD | Show all uncommitted changes (difference between working copy and last commit)
 git diff develop --staged -- \*ShopController.js | Show changes regarding specific file between index and develop
 git diff [commit_hash_1] [commit_hash_2] | Show changes between two given commits
 git diff [commit_hash_1] [commit_hash_2] > some.patch | Dump changes as patch file
@@ -178,6 +182,7 @@ Command | Description
 git clean -xdf | Delete all untracked (ignored) files and folders
 git clean -nxdf | Just display what would be deleted
 git archive --format zip --output filename.zip [commit_hash] | Create zip archive of project state according given commit
+git shortlog -sne | List all developers
 
 ## git references ##
 
@@ -186,7 +191,7 @@ Reference | Description
 [commit_hash] | See git terms
 [branch_name] | See git terms (don't forget about 'origin/[branch_name]')
 [tag_name] | See git terms
-head (HEAD) | See git terms
+HEAD | See git terms
 @ | Equal to HEAD
 @\{u\} | The upstream of current branch: @{upstream}
 HEAD@{1} | Take previous HEAD location
@@ -194,7 +199,8 @@ HEAD@{N} | Take HEAD location from history (see git reflog)
 @{-1} | Take previous checked out branch
 \- | The same, but only in `git checkout -` and `git merge -`
 @{-N} | Take N-th last checked out branch
-MERGE_HEAD | During merge, the tip of merged branch
+MERGE_HEAD | The tip of branch you are merging from
+ORIG_HEAD | During merge or rebase, the original tip of current branch
 [ref] | Any of above, points to certain commit
 [ref]~1 | Take its parent (exactly direct one in case if multiple parents)
 [ref]~ | The same
@@ -207,7 +213,7 @@ MERGE_HEAD | During merge, the tip of merged branch
 [ref]^N | Take exactly Nth parent (one step back in hierarchy anyway), see octopus merge
 [ref]^^ | Equal to [ref]~2 (two steps back)
 [ref]\~5^2\~3 | Go 5 commits back, then turn to second parent and then 3 commits back more
-
+develop@{yesterday} | TO DESCRIBE
 
 
 ## git setup ##
@@ -233,11 +239,12 @@ merge.renameLimit | TO DESCRIBE
 * You can add one existing local repo as a remote for another
 * Before performing some operations (like big rebase) do create and store a separate backup branch
 * Close and open gui client if no changes visible there
+* Press TAB to autocomplete commands, their options, branch names (may be you need to set it up)
 * You can use aliases - TO DESCRIBE
 * How to exit vim text editor: with saving changes - just type [ESC :wq], without saving [ESC :q!]
 * Prefer SSD over HDD to boost git operation performance
-* 'git help', 'git help pull' - embedded documentation
-
+* `git help`, `git help pull` - embedded documentation
+* `GIT_TRACE=1` - enable git tracing (there are others like `GIT_CURL_VERBOSE=1`)
 
 ## why use git shell? ##
 * You just can't execute most of operations with gui client
