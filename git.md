@@ -29,8 +29,9 @@ Note: you interact with remote repository only in case of 'clone', 'fetch', 'pul
 
 Term | Description
 --- | ---
-commit | Fixed (immutable) snapshot which describes complete and certain state of the project (not changeset!) <br> with entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and references its parent commits
-[commit_hash] | Unique identifier of any commit, the principal way to refer certain project state. <br> Looks like f5b5e37, which is a short form - just a unique substring of full value <br> f5b5e3719202bc5a78d97fc48aa089ca3034ce04 - calculated as SHA-1 hash from every data mentioned above. Short form can have different length.
+commit | Fixed (immutable) snapshot which describes complete and certain state of the project (not changeset!) referring entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and references its parent commits
+[commit_hash] | Unique identifier of any commit, the principal way to refer certain project state. <br> Looks like f5b5e37, which is a short form - just a unique substring of full value <br> f5b5e3719202bc5a78d97fc48aa089ca3034ce04 - calculated as SHA-1 hash from every data mentioned above
+changeset | A set of changes. Dynamically calculated difference between two certain project states. When you watch a commit - it's a difference against its previous commit (direct parent). In case of watching index (staging) - against last commit. And unstaged changes - is a changeset between index and working copy.
 branch | An independent line of development which "grows" by appending new commits
 branch tip (HEAD) | Is a last commit of the branch. <br> The tip of local branch gets promoted by performing commit and pull. <br> Whereas tip of remote branch - by fetch and push
 [branch_name] | Just a reference to branch tip (local or remote). Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
@@ -50,7 +51,7 @@ tag | Fixed reference to the fixed commit, <br> typically to mark certain releas
 index (staged files) | Next commit will be created from this set of changes
 ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream. All others are common.
 fast-forward | Special case of merge, when you merge commits from another branch <br> to your current branch, and your branch is completely behind it (ahead is 0, behind > 0), <br> there is no need in merge commit, current branch tip is just lifted up (by default)
-dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' <br> or by creating new branch for that commit
+dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' or by creating new branch for that commit
 merge | TO DESCRIBE
 merge commit | Commit with two parent commits (first - direct one and second - tip of merged branch)
 merge conflict | TO DESCRIBE
@@ -140,7 +141,7 @@ git log -10 --pretty=format:'%h - %<(20)%an \| %<(14)%ar \| %s' | Show last 10 c
 git log [commit_hash_1]..[commit_hash_2] | Show given commit range
 git log HEAD..@{u} | Show all new commits from upstream
 git log --grep 'strange bug'  | Filter by commit message containing text 'strange bug'
-git log --follow \*ShopController.js | Filter by affecting file 'ShopController.js'
+git log --follow \*ShopController.js | Filter by affected file 'ShopController.js'
 git log --author='John' | Filter by author name or email (case-sensitive)
 git log HEAD~100..HEAD -S 'console.log(' | Filter by changed source code text 'console.log('
 git log -p | Show the full diff of each commit
@@ -162,6 +163,7 @@ git apply some.patch | Apply that patch file
 git diff --name-only [other_args] | Show only file names
 git diff --name-status [other_args] | The same, but also with file status
 git diff --check | Show any left merge conflict markers and whitespace errors
+git show | Show changes in last commit
 
 
 #### How to check if one commit is parent for another (copy-paste it to shell) ####
@@ -240,7 +242,7 @@ merge.renameLimit | TO DESCRIBE
 * Before performing some operations (like big rebase) do create and store a separate backup branch
 * Close and open gui client if no changes visible there
 * Press TAB to autocomplete commands, their options, branch names (may be you need to set it up)
-* You can use aliases - TO DESCRIBE
+* You can use git aliases - [example](https://github.com/capslocky/my-git-config#aliases)
 * How to exit vim text editor: with saving changes - just type [ESC :wq], without saving [ESC :q!]
 * Prefer SSD over HDD to boost git operation performance
 * `git help`, `git help pull` - embedded documentation
