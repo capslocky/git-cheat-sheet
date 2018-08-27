@@ -31,7 +31,7 @@ Term | Description
 --- | ---
 commit | Fixed (immutable) snapshot which describes complete and certain state of the project (not changeset!) referring entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and references its parent commits
 [commit_hash] | Unique identifier of any commit, the principal way to refer certain project state. <br> Looks like f5b5e37, which is a short form - just a unique substring of full value <br> f5b5e3719202bc5a78d97fc48aa089ca3034ce04 - calculated as SHA-1 hash from every data mentioned above
-changeset (changes, diff) | A set of changes. Always dynamically calculated difference between two certain project states. When you watch a commit - it's a difference against its previous commit (direct parent). In case of watching index (staging) - against last commit. And unstaged changes - is a changeset between index and working copy.
+changeset&nbsp;(changes,&nbsp;diff) | A set of changes. Always dynamically calculated difference between two certain project states. When you watch a commit - it's a difference against its previous commit (direct parent). In case of watching index (staging) - against last commit. And unstaged changes - is a changeset between index and working copy.
 branch | An independent line of development which "grows" by appending new commits
 branch tip (HEAD) | Is a last commit of the branch. <br> The tip of local branch gets promoted by performing commit and pull. <br> Whereas tip of remote branch - by fetch and push
 [branch_name] | Just a reference to branch tip (local or remote). Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
@@ -51,7 +51,7 @@ tag | Fixed reference to the fixed commit, <br> typically to mark certain releas
 index (staged files) | Next commit will be created from this set of changes
 ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream. All others are common.
 fast-forward | Special case of merge, when you merge commits from another branch <br> to your current branch, and your branch is completely behind it (ahead is 0, behind > 0), <br> there is no need in merge commit, current branch tip is just lifted up (by default)
-dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' or by creating new branch for that commit
+dangling&nbsp;(orphan,&nbsp;lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' or by creating new branch for that commit
 to merge | Integrate another branch into current branch
 merge commit | Commit with two parent commits (first - direct one and second - tip of merged branch)
 merge conflict | TO DESCRIBE
@@ -123,7 +123,7 @@ theirs | Source branch changes (during merge - another branch, during rebase - c
 git merge [another_branch] -X ours | Automatically resolve merge conflicts choosing changes from current branch
 git merge [another_branch] -X theirs | Automatically resolve merge conflicts choosing changes from another branch
 git rebase [another_branch] -X ours | Automatically resolve rebase conflicts choosing changes from another branch
-git rebase [another_branch] -X theirs | Automatically resolve rebase conflicts choosing changes from current branch
+git&nbsp;rebase&nbsp;[another_branch]&nbsp;&#8209;X&nbsp;theirs | Automatically resolve rebase conflicts choosing changes from current branch
 
 
 ## git investigating ##
@@ -166,7 +166,7 @@ Command | Description
 git diff | Show only non-staged changes (difference between working copy and index)
 git diff --staged | Show only staged changes (difference between index and last commit), the same as `git diff --cached`
 git diff HEAD | Show all uncommitted changes (difference between working copy and last commit)
-git diff develop --staged -- \*ShopController.js | Show changes regarding specific file between index and develop
+git&nbsp;diff&nbsp;develop&nbsp;--staged&nbsp;--&nbsp;\*ShopController.js | Show changes regarding specific file between index and develop
 git diff [commit_hash_1] [commit_hash_2] | Show changes between two given commits
 git diff [commit_hash_1] [commit_hash_2] > some.patch | Dump changes as patch file
 git apply some.patch | Apply that patch file
