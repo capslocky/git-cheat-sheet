@@ -31,13 +31,13 @@ Term | Description
 --- | ---
 commit | Fixed (immutable) snapshot which describes complete and certain state of the project (not changeset!) referring entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and references its parent commits
 [commit_hash] | Unique identifier of any commit, the principal way to refer certain project state. <br> Looks like f5b5e37, which is a short form - just a unique substring of full value <br> f5b5e3719202bc5a78d97fc48aa089ca3034ce04 - calculated as SHA-1 hash from every data mentioned above
-changeset | A set of changes. Dynamically calculated difference between two certain project states. When you watch a commit - it's a difference against its previous commit (direct parent). In case of watching index (staging) - against last commit. And unstaged changes - is a changeset between index and working copy.
+changeset (changes, diff) | A set of changes. Always dynamically calculated difference between two certain project states. When you watch a commit - it's a difference against its previous commit (direct parent). In case of watching index (staging) - against last commit. And unstaged changes - is a changeset between index and working copy.
 branch | An independent line of development which "grows" by appending new commits
 branch tip (HEAD) | Is a last commit of the branch. <br> The tip of local branch gets promoted by performing commit and pull. <br> Whereas tip of remote branch - by fetch and push
 [branch_name] | Just a reference to branch tip (local or remote). Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
 working copy (tree) | Your current state of files, it's what you see and edit. HEAD + uncommitted changes
 HEAD | Automatic reference to the current (base, last) commit of your working copy
-checkout | Make working copy represent given commit (typically by branch name)
+to checkout | Make working copy represent given commit (typically by branch name)
 detached HEAD | When your HEAD is not a tip of any branch
 [remote_name] | Remote repository (by default you have only one named 'origin')
 remote branch | Remote repository branch, works as a local reference, always contains remote prefix ('origin/develop')
@@ -52,11 +52,11 @@ index (staged files) | Next commit will be created from this set of changes
 ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream. All others are common.
 fast-forward | Special case of merge, when you merge commits from another branch <br> to your current branch, and your branch is completely behind it (ahead is 0, behind > 0), <br> there is no need in merge commit, current branch tip is just lifted up (by default)
 dangling (orphan, lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' or by creating new branch for that commit
-merge | TO DESCRIBE
+to merge | Integrate another branch into current branch
 merge commit | Commit with two parent commits (first - direct one and second - tip of merged branch)
 merge conflict | TO DESCRIBE
 to amend commit | Recreate last commit as a new commit in order to append more changes or fix its message. <br> Warning: if commit has been pushed and used by other developer, don't do amend
-rebase | TO DESCRIBE
+to rebase | Place current branch on the top of another branch. Rebase will replay (recreate) commits as if branch has been started from another project state. Technically for every commit it takes its changeset and applies on the top (so conflicts are possible). <br> Warning: if branch has been pushed and used by other developer, don't do rebase
 pull request | TO DESCRIBE
 gitflow workflow | TO DESCRIBE
 bare repository | TO DESCRIBE
@@ -107,13 +107,23 @@ git reset --soft HEAD~1 | Disassemble last commit into index (with preserving al
 git commit --amend --no-edit <br> git push -f | Amend and repush last commit. <br> Warning: remote branch tip overwriting, see git status -sb
 
 
-## git merging ##
+## git merge and rebase ##
 Command | Description
 --- | ---
-git merge | TO DESCRIBE
-git merge [branch_name] --no-ff --no-edit | TO DESCRIBE
-git merge --abort | TO DESCRIBE
-git rebase | TO DESCRIBE
+git merge [another_branch] | Integrate another branch into current branch
+git merge [another_branch] --no-edit | Use standard merge message without starting text editor
+git merge [another_branch] --no-ff | No fast-forward, create merge commit anyway
+git merge --abort | Abort merge and return to inital state
+git merge --continue | Continue merge after resolving conflict
+git rebase [another_branch] | Place current branch on the top of another branch
+git rebase --abort | Abort rebase and return to inital state
+git rebase --continue | Continue rebase after resolving conflict
+ours | Destination branch changes (during merge - current branch, during rebase - another branch)
+theirs | Source branch changes (during merge - another branch, during rebase - current branch
+git merge [another_branch] -X ours | Automatically resolve merge conflicts choosing changes from current branch
+git merge [another_branch] -X theirs | Automatically resolve merge conflicts choosing changes from another branch
+git rebase [another_branch] -X ours | Automatically resolve rebase conflicts choosing changes from another branch
+git rebase [another_branch] -X theirs | Automatically resolve rebase conflicts choosing changes from current branch
 
 
 ## git investigating ##
@@ -186,6 +196,7 @@ git clean -nxdf | Just display what would be deleted
 git archive --format zip --output filename.zip [commit_hash] | Create zip archive of project state according given commit
 git shortlog -sne | List all developers
 
+
 ## git references ##
 
 Reference | Description
@@ -234,6 +245,13 @@ diff.renameLimit | TO DESCRIBE
 merge.renameLimit | TO DESCRIBE
 
 
+## git advanced commands ##
+Command | Description
+--- | ---
+git merge $(git commit-tree [commit_hash]^{tree} -p HEAD -m 'Any message') | Create new commit on the current branch so its project state will be the same as in another commit
+
+
+
 ## git tips ##
 * Because [commit_hash], [branch_name], HEAD, etc. are just only references, you can use one in place of another
 * Local branches, remote branches, remote urls are stored as easy-to-edit text files in .git folder
@@ -247,9 +265,11 @@ merge.renameLimit | TO DESCRIBE
 * Prefer SSD over HDD to boost git operation performance
 * `git help`, `git help pull` - embedded documentation
 * `GIT_TRACE=1` - enable git tracing (there are others like `GIT_CURL_VERBOSE=1`)
+* Typically you need only high-level commands (aka porcelain). But there also plumbing (low-level) commands, which allow you to implement much more advanced scenarios
+
 
 ## why use git shell? ##
-* You just can't execute most of operations with gui client
+* You just can't do most of operations with gui client
 * You don't have to stop using your gui client, because shell greatly complements any gui client
 * It is the fastest way in many everyday cases
 * Much less chance to involve your repo into 'bad' state and much easier to fix it
@@ -264,6 +284,7 @@ merge.renameLimit | TO DESCRIBE
 * Git was created by Linus Torvalds back in 2005 for Linux kernel development collaboration specifically
 * Repository can have more than 1 root (inital) commit, there are 4 in Linux kernel
 * Octopus merge is a merge from more than 2 parent commits, it inspired octocat - mascot of GitHub
+* Official git manual starts with line 'git - the stupid content tracker'
 
 
 ## git links ##
