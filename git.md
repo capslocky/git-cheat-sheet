@@ -13,7 +13,7 @@ git commit -m '[message]' | Create new local commit from index
 git push -u origin HEAD | Send current local branch as **new** remote branch <br> (and set as upstream)
 git push | Send new local commits of the current branch to its <br> **existing** upstream branch (remote expects fast-forward)
 git push -f [remote_name] [branch_name] | The same, but with forced overwrite and explicit names. <br> Warning: remote branch tip overwriting
-git fetch | Download new commits of all remote branches without merging <br> (just updating local references to remote branches)
+git fetch | Download new commits of all remote branches without merging <br> (updating references 'origin/branch_name')
 git fetch --tags | The same, but with tags as well
 git pull | Download and merge new commits to the current branch from its <br> upstream (fast-forward possible here)
 git pull --rebase | The same, but using rebase instead of merge
@@ -118,8 +118,8 @@ git merge --continue | Continue merge after resolving conflict
 git rebase [another_branch] | Place current branch on the top of another branch
 git rebase --abort | Abort rebase and return to inital state
 git rebase --continue | Continue rebase after resolving conflict
-ours | Destination branch changes (during merge - current branch, during rebase - another branch)
-theirs | Source branch changes (during merge - another branch, during rebase - current branch
+ours | Destination branch changes <br> (during merge - current branch, during rebase - another branch)
+theirs | Source branch changes <br> (during merge - another branch, during rebase - current branch
 git merge [another_branch] -X ours | Automatically resolve merge conflicts choosing changes from current branch
 git merge [another_branch] -X theirs | Automatically resolve merge conflicts choosing changes from another branch
 git rebase [another_branch] -X ours | Automatically resolve rebase conflicts choosing changes from another branch
@@ -130,6 +130,8 @@ git&nbsp;rebase&nbsp;[another_branch]&nbsp;&#8209;X&nbsp;theirs | Automatically 
 
 Command | Description
 --- | ---
+git blame | TO DESCRIBE
+git reflog |  TO DESCRIBE
 git cherry -v | Show local commits yet to be pushed to upstream
 git branch -v | Show all local branches with respective tip commits and ahead/behind status
 git branch --no-merged develop | Show all local branches not merged to develop branch
@@ -141,7 +143,7 @@ git rev-list --left-right <br> --count [branch_name_1]...[branch_name_2] | Displ
 git merge-base [branch_name_1] [branch_name_2] | Show last common parent commit between two given branches
 git describe --tags [commit_hash] | Show the most recent tag among parent commits
 git describe --contains [commit_hash] | Show tag which contains given commit
-git blame | TO DESCRIBE
+
 
 
 ## git log ##
