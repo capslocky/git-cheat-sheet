@@ -17,9 +17,9 @@ git fetch | Download new commits of all remote branches without merging <br> (up
 git fetch --tags | The same, but with tags as well
 git pull | Download and merge new commits to the current branch from its <br> upstream (fast-forward possible here)
 git pull --rebase | The same, but using rebase instead of merge
-git branch -d [branch_name] | Delete the local branch
+git branch -d [branch_name] | Delete local branch
 git branch -D [branch_name] | The same, but force
-git push origin -delete [branch_name] | Delete the remote branch on remote repository
+git push origin --delete [branch_name] | Delete remote branch in remote repository
 git init | Initialize current directory as a new empty git repository
 
 Note: you interact with remote repository only in case of 'clone', 'fetch', 'pull' or 'push', all other operations are local and don't need network connection
@@ -29,18 +29,20 @@ Note: you interact with remote repository only in case of 'clone', 'fetch', 'pul
 
 Term | Description
 --- | ---
+repository | Your project's folder under version control, it contains hidden `.git` folder and may contain `.gitignore` and `.gitattributes` files
+bare repository | Repository without working copy (no checkout possible). Typical server repository
 commit | Fixed (immutable) snapshot which describes complete and certain state of the project (not changeset!) referring entire previous snapshot history. It has unique hash, arbitrary message, author, committer, author date, commit date and references its parent commits
 [commit_hash] | Unique identifier of any commit, the principal way to refer certain project state. <br> Looks like f5b5e37, which is a short form - just a unique substring of full value <br> f5b5e3719202bc5a78d97fc48aa089ca3034ce04 - calculated as SHA-1 hash from every data mentioned above
 changeset&nbsp;(changes,&nbsp;diff) | A set of changes. Always dynamically calculated difference between two certain project states. When you watch a commit - it's a difference against its previous commit (direct parent). In case of watching index (staging) - against last commit. And unstaged changes - is a changeset between index and working copy.
 branch | An independent line of development which "grows" by appending new commits
-branch tip (HEAD) | Is a last commit of the branch. <br> The tip of local branch gets promoted by performing commit and pull. <br> Whereas tip of remote branch - by fetch and push
-[branch_name] | Just a reference to branch tip (local or remote). Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
+branch tip (head) | Is a last commit of the branch. <br> The tip of local branch gets promoted by performing commit and pull. <br> Whereas tip of remote branch - by fetch and push
+[branch_name] | Just a reference to branch tip (local or remote). <br> Typically consists of two parts with jira ticket id <br> ('feature/ASD-4385-shop-workflow', 'bugfix/ASD-4512', 'origin/bugfix/ASD-4512')
 working copy (tree) | Your current state of files, it's what you see and edit. HEAD + uncommitted changes
-HEAD | Automatic reference to the current (base, last) commit of your working copy
-to checkout | Make working copy represent given commit (typically by branch name)
-detached HEAD | When your HEAD is not a tip of any branch
+HEAD | Automatic reference to the current (base, last) commit. Typically the tip of current branch.
+detached HEAD | When your HEAD is not a tip of any branch (after checking out arbitrary commit)
+to checkout | Make working copy (and HEAD) represent given commit (typically by branch name)
 [remote_name] | Remote repository (by default you have only one named 'origin')
-remote branch | Remote repository branch, works as a local reference, always contains remote prefix ('origin/develop')
+remote branch | Remote repository branch, works as a local reference to its last known position (commit), always contains remote prefix ('origin/develop')
 upstream (or remote-tracking) branch | Linked remote branch, typically with the same name: <br> 'origin/bugfix/ASD-4512', to push/pull local branch commits from
 master branch | The only branch existing in every git repository from the beginning, <br> typically holds production-ready code
 develop branch | Permanent branch with latest developed features for the next release
@@ -48,20 +50,21 @@ feature branch | Temporary branch for separate developing of specific feature
 release branch | Temporary branch targeting preparation of specific release 
 hotfix branch | Temporary branch just for fixing bug found on production
 tag | Fixed reference to the fixed commit, <br> typically to mark certain release, like 'v1.8.5-rc2'
-index (staged files) | Next commit will be created from this set of changes
+index <br> (staged files, staging area) | Next commit will be created from this set of changes
 ahead 3 / behind 5 | Amount of unique new commits in comparison with upstream, <br> ahead 3 - is yours, behind 5 - in upstream. All others are common.
-fast-forward | Special case of merge, when you merge commits from another branch <br> to your current branch, and your branch is completely behind it (ahead is 0, behind > 0), <br> there is no need in merge commit, current branch tip is just lifted up (by default)
-dangling&nbsp;(orphan,&nbsp;lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' or by creating new branch for that commit
 to merge | Integrate another branch into current branch
-merge commit | Commit with two parent commits (first - direct one and second - tip of merged branch)
-merge conflict | TO DESCRIBE
+merge commit | Commit with two parent commits (first - direct one and second - tip of merged branch). <br> Should contain correct union of both.
+evil merge | Merge that introduces unique changes that don't appear in any parents.
+merge conflict | The situation during merge when same lines of code were changed concurrently and differently, so git can't merge them automatically.
+fast-forward | Special case of merge, when you merge commits from another branch <br> into your current branch, and your branch is completely behind it (ahead is 0, behind > 0), <br> there is no need in merge commit, current branch tip is just moved forward. But there is an option to create merge commit anyway.
 to amend commit | Recreate last commit as a new commit in order to append more changes or fix its message. <br> Warning: if commit has been pushed and used by other developer, don't do amend
 to rebase | Place current branch on the top of another branch. Rebase will replay (recreate) commits as if branch has been started from another project state. Technically for every commit it takes its changeset and applies on the top (so conflicts are possible). <br> Warning: if branch has been pushed and used by other developer, don't do rebase
 pull request | TO DESCRIBE
+fork | TO DESCRIBE
 gitflow workflow | TO DESCRIBE
-bare repository | TO DESCRIBE
+dangling&nbsp;(orphan,&nbsp;lost) commit | Commit that isn't referenced by any branch or tag (not visible in gui client), <br> but still visible through 'git reflog' and 'git fsck' until garbage collection. <br> Can be restored by 'git merge [commit_hash]' or 'git reset --hard [commit_hash]' or by creating new branch for that commit
 patch | A single set of changes (typically output of git diff) exported to text file
-
+git object | Immutable unit of repository storage (commit, tag, tree or blob). <br> Blob is file contents, tree is folder contents.
 
 ## git file commands ##
 
@@ -73,10 +76,11 @@ git reset [file_name] | Move the file change out of index (unstaging)
 git reset | Unstage all the changes
 git rm [file_name] | Remove committed file
 git mv [file_name] [new_file_name] | Move/rename committed file
-git checkout [commit_hash] -- [file_name] | Restore file state from the specific commit
-git checkout -- [file_name] | The same but from last commit, i.e. undo changes
+git checkout [commit_hash] [file_name] | Restore file state from the specific commit
+git checkout [file_name] | The same but from last commit, i.e. undo changes
 git stash | TO DESCRIBE
 git stash pop | TO DESCRIBE
+git rev-parse --show-toplevel | Show root folder of current repository 
 
 
 ## git extra commands ##
@@ -86,7 +90,7 @@ Command | Description
 git reset --hard [commit_hash] | Reset working copy and current branch tip to the given commit. <br> Warning: orphan commits may appear
 git commit --amend --no-edit | Add changes to the last commit from index without message editing
 git commit --amend -m 'New commit message' | Change the message of last commit
-git cherry-pick [commit_hash] | Copy given commit into current branch (copy changes)
+git cherry-pick [commit_hash] | Copy given commit into current branch (copy changes as a new commit)
 git cherry-pick [commit_hash_1]^..[commit_hash_2] | The same but take multiple commits from given range
 git remote prune origin | TO DESCRIBE
 git branch [branch_name] [commit_hash] | Create new local branch for a specfic commit
@@ -104,6 +108,7 @@ Command | Description
 git reset --hard HEAD | Discard all uncommitted changes in working copy (reset to last local commit)
 git reset --hard @{u} | Make working copy and current branch exact as its upstream
 git reset --soft HEAD~1 | Disassemble last commit into index (with preserving all uncommitted changes)
+git revert HEAD --no-edit | Create new commit that will undo changes in last commit
 git commit --amend --no-edit <br> git push -f | Amend and repush last commit. <br> Warning: remote branch tip overwriting, see git status -sb
 
 
@@ -140,22 +145,32 @@ git branch --merged develop -r | The same, but for remote branches <br> (-a to s
 git remote -v | TO DESCRIBE
 git tag --list --contains d485e45 | Show all tags containing given commit
 git rev-list --left-right <br> --count [branch_name_1]...[branch_name_2] | Display ahead/behind between two given branches
-git merge-base [branch_name_1] [branch_name_2] | Show last common parent commit between two given branches
+git merge-base [branch_name_1] [branch_name_2] | Show last common parent commit for two given branches
 git describe --tags [commit_hash] | Show the most recent tag among parent commits
 git describe --contains [commit_hash] | Show tag which contains given commit
+git grep [commit_hash] "console.log(" |  Find substring in given project state
+git grep --heading --break --ignore-case -e 'TODO:' |  TO DESCRIBE
+git show-ref | Show all known references (branches, tags) along with commit hashes
 
-
-
-## git log ##
+## git log filters ##
 Command | Description
 --- | ---
-git log -10 --pretty=format:'%h - %<(20)%an \| %<(14)%ar \| %s' | Show last 10 commits with pretty formatting
+git log -10 | Show last 10 commits
 git log [commit_hash_1]..[commit_hash_2] | Show given commit range
 git log HEAD..@{u} | Show all new commits from upstream
+git log @{u}..HEAD | Show all new local commits to be pushed to upstream
+git log --since="2 weeks ago" | Filter by time period
 git log --grep 'strange bug'  | Filter by commit message containing text 'strange bug'
 git log --follow \*ShopController.js | Filter by affected file 'ShopController.js'
 git log --author='John' | Filter by author name or email (case-sensitive)
 git log HEAD~100..HEAD -S 'console.log(' | Filter by changed source code text 'console.log('
+
+
+
+## git log options ##
+Command | Description
+--- | ---
+git log --pretty=format:'%h - %<(20)%an \| %<(14)%ar \| %s' | Example of pretty formatting
 git log -p | Show the full diff of each commit
 git log --oneline | Show only one line per commit
 git log --stat | Show file change statistics
@@ -176,7 +191,7 @@ git diff --name-only [other_args] | Show only file names
 git diff --name-status [other_args] | The same, but also with file status
 git diff --check | Show any left merge conflict markers and whitespace errors
 git show | Show changes in last commit
-
+git format-patch [commit_hash_1] [commit_hash_2] | Create patch files, one commit - one file
 
 #### How to check if one commit is parent for another (copy-paste it to shell) ####
 ```bash
@@ -195,9 +210,11 @@ Command | Description
 --- | ---
 git clean -xdf | Delete all untracked (ignored) files and folders
 git clean -nxdf | Just display what would be deleted
-git archive --format zip --output filename.zip [commit_hash] | Create zip archive of project state according given commit
+git archive --format zip --output filename.zip [commit_hash] | Create zip archive of project state according to given commit
 git shortlog -sne | List all developers
-
+git show [commit_hash]:[file_path] | Display file contents according to given commit
+gitk | Display commit graph with tool 'gitk'
+git gc | Delete loose data like dangling commits, compress non-loose data
 
 ## git references ##
 
@@ -208,12 +225,15 @@ Reference | Description
 [tag_name] | See git terms
 HEAD | See git terms
 @ | Equal to HEAD
-@\{u\} | The upstream of current branch: @{upstream}
+@\{u\} | The upstream of current branch: `@{upstream}`
 HEAD@{1} | Take previous HEAD location
-HEAD@{N} | Take HEAD location from history (see git reflog)
+HEAD@{N} | Take HEAD location from history (from `git reflog`)
 @{-1} | Take previous checked out branch
 \- | The same, but only in `git checkout -` and `git merge -`
 @{-N} | Take N-th last checked out branch
+develop@{yesterday} | Take branch position one day ago (from `git reflog`)
+develop@{"1 week ago"} | The same but week ago
+master@{2} | Take branch position two changes back
 MERGE_HEAD | The tip of branch you are merging from
 ORIG_HEAD | During merge or rebase, the original tip of current branch
 [ref] | Any of above, points to certain commit
@@ -228,7 +248,7 @@ ORIG_HEAD | During merge or rebase, the original tip of current branch
 [ref]^N | Take exactly Nth parent (one step back in hierarchy anyway), see octopus merge
 [ref]^^ | Equal to [ref]~2 (two steps back)
 [ref]\~5^2\~3 | Go 5 commits back, then turn to second parent and then 3 commits back more
-develop@{yesterday} | TO DESCRIBE
+git show [ref] | Show referenced commit (check reference)
 
 
 ## git setup ##
@@ -265,6 +285,7 @@ git merge $(git commit-tree [commit_hash]^{tree} -p HEAD -m 'Any message') | Cre
 * You can use git aliases - [example](https://github.com/capslocky/my-git-config#aliases)
 * How to exit vim text editor: with saving changes - just type [ESC :wq], without saving [ESC :q!]
 * Prefer SSD over HDD to boost git operation performance
+* You can use git hooks - scripts that executed automatically before/after commit, push or receive occurs
 * `git help`, `git help pull` - embedded documentation
 * `GIT_TRACE=1` - enable git tracing (there are others like `GIT_CURL_VERBOSE=1`)
 * Typically you need only high-level commands (aka porcelain). But there also plumbing (low-level) commands, which allow you to implement much more advanced scenarios
